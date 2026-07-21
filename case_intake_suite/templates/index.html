@@ -1,0 +1,62 @@
+{% extends 'layout.html' %}
+{% block title %}All Cases | Case Intake Suite{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>All Cases</h1>
+  <a href="{{ url_for('new_case') }}" class="btn btn-primary">+ New Case</a>
+</div>
+
+{% if cases %}
+<div class="filter-bar">
+  <label>Filter by status:</label>
+  <select id="statusFilter" onchange="filterCases()">
+    <option value="all">All</option>
+    {% for s in statuses %}
+    <option value="{{ s }}">{{ s|title }}</option>
+    {% endfor %}
+  </select>
+</div>
+
+<table class="cases-table">
+  <thead>
+    <tr>
+      <th>Case ID</th>
+      <th>Handle</th>
+      <th>Category</th>
+      <th>Status</th>
+      <th>Created</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="casesBody">
+    {% for c in cases %}
+    <tr class="case-row" data-status="{{ c.status }}">
+      <td><code>{{ c.id }}</code></td>
+      <td>{{ c.handle or '-' }}</td>
+      <td><span class="badge badge-{{ c.category }}">{{ c.category }}</span></td>
+      <td><span class="status-badge status-{{ c.status }}">{{ c.status }}</span></td>
+      <td>{{ c.created_at[:10] }}</td>
+      <td>
+        <a href="{{ url_for('case_detail', case_id=c.id) }}" class="btn btn-sm">View</a>
+        <a href="{{ url_for('export_case', case_id=c.id) }}" class="btn btn-sm btn-outline">Export</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<script>
+function filterCases() {
+  const val = document.getElementById('statusFilter').value;
+  document.querySelectorAll('.case-row').forEach(row => {
+    row.style.display = (val === 'all' || row.dataset.status === val) ? '' : 'none';
+  });
+}
+</script>
+
+{% else %}
+<div class="empty-state">
+  <p>No cases yet. <a href="{{ url_for('new_case') }}">Create your first case.</a></p>
+</div>
+{% endif %}
+{% endblock %}
