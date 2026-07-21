@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+{% block title %}New Case | Case Intake Suite{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>New Case</h1>
+  <a href="{{ url_for('index') }}" class="btn btn-outline">&larr; Back</a>
+</div>
+
+<form method="POST" action="{{ url_for('new_case') }}" class="case-form">
+  <div class="form-group">
+    <label for="subject_url">Subject Profile URL *</label>
+    <input type="url" id="subject_url" name="subject_url" required
+           placeholder="https://instagram.com/username">
+  </div>
+
+  <div class="form-group">
+    <label for="handle">Handle / Username</label>
+    <input type="text" id="handle" name="handle" placeholder="@username">
+  </div>
+
+  <div class="form-group">
+    <label for="category">Category *</label>
+    <select id="category" name="category" required>
+      {% for cat in categories %}
+      <option value="{{ cat }}">{{ cat|replace('-', ' ')|title }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="description">Description</label>
+    <textarea id="description" name="description" rows="3"
+              placeholder="Brief factual description of the issue"></textarea>
+  </div>
+
+  <div class="form-group">
+    <label for="reporter_notes">Reporter Notes</label>
+    <textarea id="reporter_notes" name="reporter_notes" rows="4"
+              placeholder="Factual notes for the reviewer. Dates, times, context."></textarea>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">Create Case</button>
+    <a href="{{ url_for('index') }}" class="btn btn-outline">Cancel</a>
+  </div>
+</form>
+{% endblock %}
