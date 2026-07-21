@@ -1,0 +1,90 @@
+{% extends 'layout.html' %}
+{% block title %}Case {{ case.id }} | Case Intake Suite{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Case <code>{{ case.id }}</code></h1>
+  <div class="header-actions">
+    <a href="{{ url_for('export_case', case_id=case.id) }}" class="btn btn-outline">&#x1F4E4; Export</a>
+    <a href="{{ url_for('download_export', case_id=case.id, fmt='md') }}" class="btn btn-outline">&#x2B07; .md</a>
+    <a href="{{ url_for('download_export', case_id=case.id, fmt='html') }}" class="btn btn-outline">&#x2B07; .html</a>
+    <a href="{{ url_for('index') }}" class="btn btn-outline">&larr; All Cases</a>
+  </div>
+</div>
+
+<div class="case-grid">
+  <div class="case-meta card">
+    <h2>Subject Details</h2>
+    <table class="detail-table">
+      <tr><th>Profile URL</th><td><a href="{{ case.subject_url }}" target="_blank">{{ case.subject_url }}</a></td></tr>
+      <tr><th>Handle</th><td>{{ case.handle or '-' }}</td></tr>
+      <tr><th>Category</th><td><span class="badge badge-{{ case.category }}">{{ case.category }}</span></td></tr>
+      <tr><th>Status</th><td><span class="status-badge status-{{ case.status }}">{{ case.status }}</span></td></tr>
+      <tr><th>Created</th><td>{{ case.created_at[:19] }}</td></tr>
+      <tr><th>Updated</th><td>{{ case.updated_at[:19] }}</td></tr>
+    </table>
+
+    <h3>Description</h3>
+    <p>{{ case.description or 'No description.' }}</p>
+
+    <h3>Reporter Notes</h3>
+    <p class="notes-block">{{ case.reporter_notes or 'None.' }}</p>
+  </div>
+
+  <div class="review-panel">
+    <div class="card">
+      <h2>Review</h2>
+      <p class="notes-block">{{ case.reviewer_notes or 'No reviewer notes yet.' }}</p>
+      <form method="POST" action="{{ url_for('update_case', case_id=case.id) }}">
+        <div class="form-group">
+          <label>Update Status</label>
+          <select name="status">
+            {% for s in statuses %}
+            <option value="{{ s }}" {% if s == case.status %}selected{% endif %}>{{ s|title }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Reviewer Notes</label>
+          <textarea name="reviewer_notes" rows="4">{{ case.reviewer_notes or '' }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Case</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Evidence ({{ evidence|length }})</h2>
+      {% if evidence %}
+      <ul class="evidence-list">
+        {% for e in evidence %}
+        <li class="evidence-item">
+          <strong>{{ e.description }}</strong>
+          {% if e.url %}<br><a href="{{ e.url }}" target="_blank">{{ e.url }}</a>{% endif %}
+          {% if e.file_path %}<br><code>{{ e.file_path }}</code>{% endif %}
+          <br><small>Added: {{ e.added_at[:19] }}</small>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No evidence attached yet.</p>
+      {% endif %}
+
+      <h3>Add Evidence</h3>
+      <form method="POST" action="{{ url_for('add_evidence', case_id=case.id) }}">
+        <div class="form-group">
+          <label>Description *</label>
+          <input type="text" name="description" required placeholder="What is this evidence?">
+        </div>
+        <div class="form-group">
+          <label>URL</label>
+          <input type="url" name="url" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label>File Path</label>
+          <input type="text" name="file_path" placeholder="screenshots/image.png">
+        </div>
+        <button type="submit" class="btn btn-primary">Add Evidence</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
