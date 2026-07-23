@@ -10,6 +10,7 @@
 
 ---
 
+
 ## What This Is
 
 Case Intake Suite is a structured workflow tool for documenting, triaging, and reviewing incidents before any platform action is taken. It is designed for:
